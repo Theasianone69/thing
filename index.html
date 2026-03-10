@@ -160,7 +160,7 @@
 </head>
 <body>
 
-    <div class="panic-banner">Teacher-Proof Mode Enabled: Type inside the tab to arm the shield. Press 'Q' to Panic.</div>
+    <div class="panic-banner">Teacher-Proof Mode Enabled: Type inside the tab once to arm. Press 'Q' to Panic.</div>
 
     <div class="container">
         <button class="nav-btn games-main-btn" onclick="launch('Main Games', 'https://games-4cz.pages.dev')">
@@ -186,9 +186,9 @@
             
             <div class="news-scroll-area">
                 <div class="news-text">
-                    2/27/26: Added Bloxd.io and anti-close protocols.<br>
+                    2/27/26: Blob URL Protocols Integrated.<br>
                     2/18/26: Scramjet is live on Render.<br>
-                    1/21/26: Integrated "Sticky Tab" technology.
+                    1/21/26: Shield Armed for Teacher Close Commands.
                 </div>
             </div>
         </div>
@@ -196,12 +196,7 @@
 
     <script>
         function launch(name, url) {
-            const newTab = window.open('about:blank', '_blank');
-            if (!newTab) {
-                alert('Popup blocked! Please allow popups.');
-                return;
-            }
-
+            // Updated content with specific modern Chrome triggers
             const content = `
                 <!DOCTYPE html>
                 <html>
@@ -223,18 +218,19 @@
 
                         // Step 2: The Modern Anti-Close Script
                         window.onbeforeunload = function(e) {
+                            // Chrome needs both of these to trigger the prompt
                             e.preventDefault();
-                            e.returnValue = ''; // Required for Chrome
-                            return 'SHIELD ACTIVE';
+                            e.returnValue = 'SHIELD_ACTIVE'; 
+                            return 'SHIELD_ACTIVE';
                         };
 
-                        // Step 3: Prevent extension from overriding the logic
+                        // Step 3: Re-arm shield every 200ms
                         setInterval(() => {
                             if (!window.onbeforeunload) {
                                 window.onbeforeunload = function(e) {
                                     e.preventDefault();
-                                    e.returnValue = '';
-                                    return 'SHIELD ACTIVE';
+                                    e.returnValue = 'SHIELD_ACTIVE';
+                                    return 'SHIELD_ACTIVE';
                                 };
                             }
                         }, 200);
@@ -243,19 +239,27 @@
                         window.addEventListener('keydown', function(e) {
                             if (e.key.toLowerCase() === 'q') {
                                 window.onbeforeunload = null; 
-                                window.location.href = 'https://classroom.google.com';
+                                window.location.replace('https://classroom.google.com');
                             }
                         });
                     <\/script>
                 </body>
                 </html>`;
 
-            newTab.document.open();
-            newTab.document.write(content);
-            newTab.document.close();
+            // Step 1: Create Blob (Bypasses Cloudflare CSP)
+            const blob = new Blob([content], { type: 'text/html' });
+            const blobUrl = URL.createObjectURL(blob);
+
+            // Step 2: Open and Redirect
+            const newTab = window.open('about:blank', '_blank');
+            if (newTab) {
+                newTab.location.href = blobUrl;
+            } else {
+                alert('Popup blocked! Please allow popups.');
+            }
         }
 
-        // Global Panic Key
+        // Global Panic Key for main hub
         window.addEventListener('keydown', function(e) {
             if (e.key.toLowerCase() === 'q') {
                 window.location.href = 'https://classroom.google.com';
